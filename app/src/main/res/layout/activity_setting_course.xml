@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SettingCourse">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/stCourse_cancel"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="取消" />
+        <TextView
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="3"
+            android:text="编辑课程"
+            android:textSize="20sp"
+            android:textColor="@color/blackOfShow"
+            />
+        <TextView
+            android:id="@+id/stCourse_confirm"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="确认" />
+
+    </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/et_courseName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="课程名(必填)"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:textSize="25sp"
+                />
+            <EditText
+                android:id="@+id/et_classroom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:hint="教室"
+                android:padding="10dp"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/et_teacherName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:hint="老师"
+                android:padding="10dp"
+                android:textSize="25sp" />
+            <LinearLayout
+                android:id="@+id/shangkeshijian"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="上课时间"
+                    android:textSize="20sp"
+                    android:textColor="@color/blackOfShow"/>
+                <TextView
+                    android:id="@+id/tv_courseTime"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="right|center_vertical"
+                    android:text="上课时间"
+                    android:textSize="20sp"
+                    android:textColor="@color/blackOfShow"/>
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="4"
+                android:gravity="center_vertical"
+                android:text="上课周数"
+                android:textSize="20sp"
+                android:textColor="@color/blackOfShow"/>
+            <RadioGroup
+                android:id="@+id/select_week"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="5"
+                android:orientation="horizontal"
+                >
+                <RadioButton
+                    android:id="@+id/oddWeek"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="单周"/>
+                <RadioButton
+                    android:id="@+id/doubleWeek"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="双周"/>
+                <RadioButton
+                    android:id="@+id/allWeek"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="全选"/>
+            </RadioGroup>
+        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/selectWeekContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                android:text="颜色"
+                android:textSize="20sp"
+                android:textColor="@color/blackOfShow"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:layout_marginTop="10dp">
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</LinearLayout>

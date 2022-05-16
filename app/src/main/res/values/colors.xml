@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="pink">	#FFFFC0CB</color>
+    <color name="bt_blue">#2196F3</color>
+<!--    浅黑-->
+    <color name="somber">#868686</color>
+<!--    	道奇蓝-->
+    <color name="DoderBlue">#FF1E90FF</color>
+    <color name="gray">	#FF808080</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="darkWhite">#C6C6C6</color>
+    <color name="darkGray">#a9a9a9</color>
+<!--    默认背景颜色-->
+    <color name="defaultWhite">#FFFAFAFA</color>
+    <color name="blackOfShow">#505050</color>
+    <color name="gainSboro">#dcdcdc</color>
+    <color name="cyan_bg">#FFEBF5FF</color>
+    <color name="red">#F44336</color>
+<!--    颜色搭配-->
+    <color name="bg_blue1">#E6F4FF</color>
+    <color name="show_blue1">#179EDD</color>
+    <color name="blue3">#63ADD0</color>
+</resources>
