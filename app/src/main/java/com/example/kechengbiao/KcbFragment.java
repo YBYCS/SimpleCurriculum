@@ -49,10 +49,11 @@ public class KcbFragment extends Fragment {
         //创建Fragment的布局
         view = inflater.inflate(R.layout.fragment_kcb,container,false);
         activity = (MainActivity)getActivity();
-        nowWeek = activity.getHowWeek();
+        nowWeek = activity.getNowWeek();
         context = getActivity();
         dbOpenHelper = new DBOpenHelper(context, "data.db", null, 1);
         db = dbOpenHelper.getWritableDatabase();
+        Log.d(TAG, "onCreateView: 1");
         initButton();
         getContainer();
         getInitData();
@@ -63,33 +64,11 @@ public class KcbFragment extends Fragment {
     //获取数据库数据 todo 这里的数据如果在主activity获取再读取主activity可能会优化
     private void getInitData(){
         //获取有多少节课
-        Cursor cursor = db.query("setting",
-                null,
-                "name=?",
-                new String[]{"msum"},
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        msum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
-        cursor = db.query("setting",
-                null,
-                "name=?",
-                new String[]{"asum"},
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        asum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
-        cursor = db.query("setting",
-                null,
-                "name=?",
-                new String[]{"esum"},
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        esum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        Cursor cursor ;
+        msum = activity.msum;
+        esum = activity.esum;
+        asum = activity.asum;
+        weekSum = activity.weekSum;
         //获取每节课时间是否固定
         cursor = db.query("setting",
                 null,
@@ -103,17 +82,7 @@ public class KcbFragment extends Fragment {
         int i = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
         isShowWeekend = i==1;
 
-        //获取有多少节周
-        cursor = db.query("setting",
-                null,
-                "name=?",
-                new String[]{"weeksum"},
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        cursor.moveToFirst();
-        weekSum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+
     }
 
 
@@ -129,6 +98,7 @@ public class KcbFragment extends Fragment {
                     dip2px(context,60)));
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackground(context.getDrawable(R.drawable.solid));
+            card.setGravity(Gravity.CENTER);
             container.addView(card);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -256,7 +226,7 @@ public class KcbFragment extends Fragment {
                             //课程数据类储存信息
                             courseDataClass courseData = getCourseData(cursor);
                             //判断是否为当前周的课
-                            if(courseData.week.substring(nowWeek-1,nowWeek).equals("1")){
+                            if(nowWeek<=weekSum&&0<nowWeek&&courseData.week.substring(nowWeek-1,nowWeek).equals("1")){
                                 //todo 单独使用外边距来隔开 会出现对不齐的问题 可以尝试设定一个背景来代替外边距来隔开(白色边框)
                                 LinearLayout body = new LinearLayout(context);
 
@@ -442,6 +412,7 @@ public class KcbFragment extends Fragment {
 
     private void initButton(){
         nextWeek = view.findViewById(R.id.NextWeek);
+        nextWeek.setText("->");
         nextWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -454,6 +425,7 @@ public class KcbFragment extends Fragment {
             }
         });
         lastWeek = view.findViewById(R.id.LastWeek);
+        lastWeek.setText("<-");
         lastWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -480,7 +452,7 @@ public class KcbFragment extends Fragment {
         public int beginTime,sum,period,id;
     }
 
-    //从cursor中获取课程信息
+    //从cursor中获取课程信息 todo 有bug重叠课程 应该改用id才行
     private courseDataClass getCourseData(Cursor cursor){
         courseDataClass course = new courseDataClass();
         course.beginTime = cursor.getInt(cursor.getColumnIndexOrThrow("begintime"));
@@ -495,7 +467,7 @@ public class KcbFragment extends Fragment {
         return course;
     }
 
-    //传入对应编号获取对应课程的时间
+    //传入对应时期编号获取对应课程的时间
     private int getBeginHour(String number){
         Cursor cursor = db.query("courseschedule",
                 null,

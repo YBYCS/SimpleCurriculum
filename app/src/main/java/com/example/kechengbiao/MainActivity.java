@@ -6,32 +6,41 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     //定义Fragment对象
     private Fragment fragment_1,fragment_2,fragment_3,nowFragment;
     private TextView tab_1,tab_2,tab_3;
-    private int howWeek=1;
+    public int selectWeek =1,nowWeek;
 
+    Calendar calendar;
+    private DBOpenHelper dbOpenHelper;
+    private SQLiteDatabase db;
+    public int msum,asum,esum,weekSum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //注意db要先打开 先初始化 否则有些数据没初始化没法读取
+        dbOpenHelper = new DBOpenHelper(this, "data.db", null, 1);
+        db = dbOpenHelper.getWritableDatabase();
+        calendar = Calendar.getInstance();
+        initNowWeek();
         initUI();
+        getInitData();
     }
     //初始化UI
     private  void initUI(){
@@ -58,6 +67,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void initNowWeek(){
+        //获取开学时间
+        int starYear,starDay,starMonth;
+        Cursor cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"year"},
+                null,
+                null,
+                null);
+        //如果还未初始化开学时间
+        if(cursor.getCount()==0){
+
+            selectWeek = -1;
+            return;
+        }
+        cursor.moveToFirst();
+        starYear = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"day"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        starDay = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"month"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        starMonth = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        String beginDateStr,endDateStr;
+        beginDateStr = starYear+"-";
+        beginDateStr += (starMonth<10?"0"+starMonth:String.valueOf(starMonth))+"-";
+        beginDateStr += (starDay<10?"0"+starDay:String.valueOf(starDay));
+        Log.d(TAG, "initNowWeek: "+beginDateStr);
+        starDay = calendar.get(Calendar.DAY_OF_MONTH);
+        starMonth = calendar.get(Calendar.MONTH)+1; //从0开始
+        starYear = calendar.get(Calendar.YEAR);
+        endDateStr = starYear+"-";
+        endDateStr += (starMonth<10?"0"+starMonth:String.valueOf(starMonth))+"-";
+        endDateStr += (starDay<10?"0"+starDay:String.valueOf(starDay));
+        Log.d(TAG, "initNowWeek: "+endDateStr);
+
+        long day = 0;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date beginDate;
+        Date endDate;
+        try {
+            beginDate = format.parse(beginDateStr);
+            endDate = format.parse(endDateStr);
+            day = (endDate.getTime()-beginDate.getTime())/(24*60*60*1000);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        selectWeek = (int) day/7+1;
+        nowWeek = selectWeek;
+
+    }
     //显示框架的代码 用于切换界面
     private void showFragment1(){
         //开启事务
@@ -82,11 +155,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
     private void showFragment2(){
+
         //开启事务
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         //判断Fragment是否为空
         if(fragment_2 == null){
+
             fragment_2 = new KcbFragment();
+
             transaction.add(R.id.content_layout,fragment_2);
         }
         hideAllFragment(transaction);
@@ -147,19 +223,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if(view.getId()==R.id.tv_setting)showFragment3();
 
     }
-    public int getHowWeek() {
-        return howWeek;
+    public int getNowWeek() {
+        return nowWeek;
     }
-    public void setHowWeek(int HowWeek){
-        howWeek = HowWeek;
+    public void setNowWeek(int HowWeek){
+        selectWeek = HowWeek;
     }
 
     //重新载入课程表 todo 和今日课程
     public void reLoadKcb(int theWeek){
-        howWeek = theWeek;
+        selectWeek = theWeek;
         //删除fragment
         getSupportFragmentManager().beginTransaction().remove(fragment_2).commit();
         fragment_2 = null;
         showFragment2();
+    }
+
+    //获取数据库数据
+    private void getInitData(){
+        //获取有多少节课
+        Cursor cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"msum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        msum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"asum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        asum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"esum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        esum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        //获取有多少节周
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"weeksum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        cursor.moveToFirst();
+        weekSum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+
+
+
     }
 }

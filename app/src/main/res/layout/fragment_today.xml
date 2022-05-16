@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@drawable/atri"
         android:scaleType="centerInside">
         <LinearLayout
             android:layout_width="match_parent"
@@ -17,6 +18,7 @@
             android:orientation="vertical"
             android:id="@+id/header_title_container">
             <TextView
+                android:id="@+id/date_tittle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/defaultWhite"
@@ -26,10 +28,11 @@
                 android:layout_marginLeft="30dp"
                 />
             <TextView
+                android:id="@+id/tittle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/defaultWhite"
-                android:text="知其不可而为之"
+                android:textColor="@color/blackOfShow"
+                android:text="岁寒,然后之松柏之后凋"
                 android:textSize="25sp"
                 android:layout_marginLeft="30dp"
                 />
@@ -60,7 +63,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/morning_course_container"
-                    android:orientation="vertical"/>
+                    android:orientation="vertical">
+                </LinearLayout>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -84,15 +88,15 @@
                     android:layout_marginTop="40dp"
                     android:textColor="@color/blackOfShow"
                     />
-
+                <LinearLayout
+                    android:id="@+id/evening_course_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
             </LinearLayout>
         </ScrollView>
 
-        <LinearLayout
-            android:id="@+id/evening_course_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+
     </LinearLayout>
 
 </FrameLayout>

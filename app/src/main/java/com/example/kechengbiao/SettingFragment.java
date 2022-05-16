@@ -152,7 +152,7 @@ public class SettingFragment extends Fragment {
                 int data = datePicker.getYear();
                 values.put("state",data);
                 db.update("setting",values,"name=?",new String[]{"year"});
-                data = datePicker.getMonth();
+                data = datePicker.getMonth()+1;//从0开始
                 values.put("state",data);
                 db.update("setting",values,"name=?",new String[]{"month"});
                 data = datePicker.getDayOfMonth() ;
