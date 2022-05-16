@@ -9,3 +9,7 @@
 3. 删除课程数据
 4. 数据合法性验证
 # 效果展示
+![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/today.jpg)  
+![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/kcb.jpg)  
+![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/setting.jpg)  
+![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/setting2.jpg)  
