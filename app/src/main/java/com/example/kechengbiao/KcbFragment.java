@@ -30,7 +30,7 @@ public class KcbFragment extends Fragment {
 
     private DBOpenHelper dbOpenHelper;
     private SQLiteDatabase db;
-    private int nowWeek;//记录是第几周
+    private int selectWeek;//记录是第几周
     private Fragment fragment;
     private View view;
     private Context context;
@@ -49,7 +49,7 @@ public class KcbFragment extends Fragment {
         //创建Fragment的布局
         view = inflater.inflate(R.layout.fragment_kcb,container,false);
         activity = (MainActivity)getActivity();
-        nowWeek = activity.getNowWeek();
+        selectWeek = activity.selectWeek;
         context = getActivity();
         dbOpenHelper = new DBOpenHelper(context, "data.db", null, 1);
         db = dbOpenHelper.getWritableDatabase();
@@ -226,7 +226,7 @@ public class KcbFragment extends Fragment {
                             //课程数据类储存信息
                             courseDataClass courseData = getCourseData(cursor);
                             //判断是否为当前周的课
-                            if(nowWeek<=weekSum&&0<nowWeek&&courseData.week.substring(nowWeek-1,nowWeek).equals("1")){
+                            if(selectWeek <=weekSum&&0< selectWeek &&courseData.week.substring(selectWeek -1, selectWeek).equals("1")){
                                 //可优化地方 单独使用外边距来隔开 会出现对不齐的问题 可以尝试设定一个背景来代替外边距来隔开(白色边框)
                                 LinearLayout body = new LinearLayout(context);
 
@@ -385,7 +385,7 @@ public class KcbFragment extends Fragment {
         if (resultCode==0&&requestCode==666){
             //处理回调相关操作 todo
             Log.d(TAG, "onActivityResult: 1");
-            activity.reLoadKcb(nowWeek);
+            activity.reLoadKcb(selectWeek);
         }
     }
 
@@ -422,8 +422,9 @@ public class KcbFragment extends Fragment {
         nextWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(nowWeek<weekSum){
-                    activity.reLoadKcb(nowWeek+1);
+                if(selectWeek <weekSum){
+                    Log.d(TAG, "onClick: "+selectWeek);
+                    activity.reLoadKcb(selectWeek +1);
                 }
                 else{
                     Toast.makeText(context,"已经是最后一周惹",Toast.LENGTH_SHORT).show();
@@ -435,8 +436,8 @@ public class KcbFragment extends Fragment {
         lastWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(nowWeek>1){
-                    activity.reLoadKcb(nowWeek-1);
+                if(selectWeek >1){
+                    activity.reLoadKcb(selectWeek -1);
                 }
                 else{
                     Toast.makeText(context,"前方是虚空",Toast.LENGTH_SHORT).show();
@@ -444,7 +445,7 @@ public class KcbFragment extends Fragment {
             }
         });
         tittle = view.findViewById(R.id.WhenTime);
-        tittle.setText("第"+nowWeek+"周");
+        tittle.setText("第"+ selectWeek +"周");
     }
 
 

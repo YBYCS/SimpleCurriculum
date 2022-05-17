@@ -40,7 +40,7 @@ public class TodayFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_today,container,false);
         activity = (MainActivity)getActivity();
         this.view = view;
-        nowWeek = activity.getNowWeek();
+        nowWeek = activity.selectWeek;
         calendar = Calendar.getInstance();
         period = calendar.get(Calendar.DAY_OF_WEEK);
         getInitData();

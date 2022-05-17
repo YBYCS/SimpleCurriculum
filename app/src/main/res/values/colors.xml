@@ -15,7 +15,7 @@
     <color name="gray">	#FF808080</color>
     <color name="white">#FFFFFFFF</color>
     <color name="darkWhite">#C6C6C6</color>
-    <color name="darkGray">#a9a9a9</color>
+    <color name="darkGray">#CCCCCC</color>
 <!--    默认背景颜色-->
     <color name="defaultWhite">#FFFAFAFA</color>
     <color name="blackOfShow">#505050</color>

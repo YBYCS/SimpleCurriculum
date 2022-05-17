@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //定义Fragment对象
     private Fragment fragment_1,fragment_2,fragment_3,nowFragment;
     private TextView tab_1,tab_2,tab_3;
-    public int selectWeek =1,nowWeek;
+    public int selectWeek =1,nowWeek=1;
 
     Calendar calendar;
     private DBOpenHelper dbOpenHelper;
@@ -222,12 +222,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if(view.getId()==R.id.tv_kcb)showFragment2();
         else if(view.getId()==R.id.tv_setting)showFragment3();
 
-    }
-    public int getNowWeek() {
-        return nowWeek;
-    }
-    public void setNowWeek(int HowWeek){
-        selectWeek = HowWeek;
     }
 
     //重新载入课程表 todo 和今日课程

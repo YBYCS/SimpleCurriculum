@@ -215,7 +215,16 @@
             </LinearLayout>
 
     </ScrollView>
-
+    <Button
+        android:id="@+id/deleteCourse"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="删除课程"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="20dp"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:background="@drawable/button_circular"/>
 
 
 </LinearLayout>

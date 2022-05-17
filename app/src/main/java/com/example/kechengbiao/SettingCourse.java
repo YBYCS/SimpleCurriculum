@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -52,9 +53,23 @@ public class SettingCourse extends AppCompatActivity {
         getInitData();
         getUI();
         courseSum = msum+asum+esum;//有多少节课
-        LinearLayout container = (LinearLayout) findViewById(R.id.selectWeekContainer);//第几周上课选择卡的容器
+        addWeekSelectCard();
         initWheelData();
-        //设置那一周上课的选择卡
+        isAdd = intent.getBooleanExtra("isAdd",false);
+        //如果是添加新的课程
+        if(isAdd){
+            initAdd(intent);
+        }
+        //如果是编辑已有的课程
+        else{
+            initEdit(intent);
+        }
+    }
+
+    //设置那一周上课的选择卡
+    void addWeekSelectCard(){
+
+        LinearLayout container = (LinearLayout) findViewById(R.id.selectWeekContainer);//第几周上课选择卡的容器
         for (int i = 0; i < weekSum; i+=6) {
 
             LinearLayout cardContainer = new LinearLayout(this);
@@ -109,16 +124,8 @@ public class SettingCourse extends AppCompatActivity {
                 selectWeekList.add(card);
             }
         }
-        isAdd = intent.getBooleanExtra("isAdd",false);
-        //设置
-        //如果是添加新的课程
-        if(isAdd){
-            initAdd(intent);
-        }//如果是编辑已有的课程
-        else{
-            initEdit(intent);
-        }
     }
+
     //如果是添加新的课程的初始化
     void initAdd(Intent intent){
         dt.beginTime = intent.getIntExtra("beginTime",0);
@@ -133,6 +140,9 @@ public class SettingCourse extends AppCompatActivity {
         //随机取个颜色
         Random random = new Random();
         colorSelectList.get(random.nextInt(6)).setChecked(true);
+        Button button = findViewById(R.id.deleteCourse);
+        button.setEnabled(false);
+        button.setTextColor(getColor(R.color.blackOfShow));
     }
     //如果是编辑已有的课程的初始化
     void initEdit(Intent intent){
@@ -158,13 +168,47 @@ public class SettingCourse extends AppCompatActivity {
                 selectWeekList.get(i).setChecked(false);
             }
         }
+        Button button = findViewById(R.id.deleteCourse);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View outerView = LayoutInflater.from(context).inflate(R.layout.dialog_hint,null);
+                TextView tv = outerView.findViewById(R.id.tittle);
+                tv.setText("确认删除");
+                tv = outerView.findViewById(R.id.content);
+                tv.setText("该操作将永久删除该课程,是否继续?");
+                AlertDialog alertDialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setView(outerView);
+                alertDialog = builder.create();
+                //设置布局中的取消按钮
+                outerView.findViewById(R.id.bt_cancel).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                });
+                //设置确定按钮
+                outerView.findViewById(R.id.bt_confirm).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //实现点击按钮的作用
+                        db.delete("coursedata","id=?",new String[]{String.valueOf(dt.id)});
+                        alertDialog.dismiss();
+                        setResult(0);
+                        finish();
+                    }
+                });
 
+                alertDialog.show();
+            }
+        });
     }
 
     int monitorBegin,monitorEnd;//接受滑动选择框的返回值
     ArrayList<RadioButton> colorSelectList;
     RadioGroup rg_color;
-    //获取界面UI控件 并且绑定部分点击事件
+    //获取界面UI控件 并且绑定事件
     private void getUI(){
         classroom = findViewById(R.id.et_classroom);
         teacher = findViewById(R.id.et_teacherName);
@@ -210,7 +254,6 @@ public class SettingCourse extends AppCompatActivity {
                         db.update("coursedata",values,"id=?",new String[]{String.valueOf(dt.id)});
                     }
 
-                    //todo 是否返回值
                     setResult(0);
                     finish();
                 }
