@@ -23,7 +23,24 @@
     <color name="cyan_bg">#FFEBF5FF</color>
     <color name="red">#F44336</color>
 <!--    颜色搭配-->
-    <color name="bg_blue1">#E6F4FF</color>
+    <color name="selected_blue">#0b83fe</color>
     <color name="show_blue1">#179EDD</color>
     <color name="blue3">#63ADD0</color>
+
+<!--    课程背景颜色选择-->
+    <color name="show1">#edecfe</color>
+    <color name="show2">#E6F4FF</color>
+    <color name="show3">#fbeacc</color>
+    <color name="show4">#e9f1fe</color>
+    <color name="show5">#feedf7</color>
+    <color name="show6">#ddfaf6</color>
+
+<!--    课程字体颜色搭配-->
+    <color name="text1">#7f7ce5</color>
+    <color name="text2">#179EDD</color>
+    <color name="text3">#f69b10</color>
+    <color name="text4">#5a8efe</color>
+    <color name="text5">#ec6aba</color>
+    <color name="text6">#3cb2c8</color>
+
 </resources>

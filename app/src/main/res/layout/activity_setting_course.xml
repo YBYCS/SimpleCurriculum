@@ -151,15 +151,69 @@
                 android:text="颜色"
                 android:textSize="20sp"
                 android:textColor="@color/blackOfShow"/>
-            <LinearLayout
+            <RadioGroup
+                android:id="@+id/rg_color"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:orientation="horizontal"
-                android:paddingHorizontal="10dp"
-                android:layout_marginTop="10dp">
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                >
+                <RadioButton
+                android:id="@+id/color1"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:button="@null"
+                android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                />
+                <RadioButton
+                    android:id="@+id/color2"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:button="@null"
+                    android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                    />
+                <RadioButton
+                    android:id="@+id/color3"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:button="@null"
+                    android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                    />
+                <RadioButton
+                    android:id="@+id/color4"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:button="@null"
+                    android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                    />
+                <RadioButton
+                    android:id="@+id/color5"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:button="@null"
+                    android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                    />
+                <RadioButton
+                    android:id="@+id/color6"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:button="@null"
+                    android:background="@drawable/radio_button_select_color"
+                    android:layout_marginRight="15dp"
+                    />
+
+            </RadioGroup>
+
 
             </LinearLayout>
-        </LinearLayout>
+
     </ScrollView>
 
 

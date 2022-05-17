@@ -227,7 +227,7 @@ public class KcbFragment extends Fragment {
                             courseDataClass courseData = getCourseData(cursor);
                             //判断是否为当前周的课
                             if(nowWeek<=weekSum&&0<nowWeek&&courseData.week.substring(nowWeek-1,nowWeek).equals("1")){
-                                //todo 单独使用外边距来隔开 会出现对不齐的问题 可以尝试设定一个背景来代替外边距来隔开(白色边框)
+                                //可优化地方 单独使用外边距来隔开 会出现对不齐的问题 可以尝试设定一个背景来代替外边距来隔开(白色边框)
                                 LinearLayout body = new LinearLayout(context);
 
                                 haveCourse=true;
@@ -242,8 +242,8 @@ public class KcbFragment extends Fragment {
                                 body.setPadding(dip2px(context,3),dip2px(context,3),dip2px(context,3),dip2px(context,3));
                                 card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.MATCH_PARENT));
-                                //todo 颜色设置
-                                card.setBackgroundColor(ContextCompat.getColor(context,R.color.bg_blue1));
+                                //todo 颜色设置 待测试
+                                card.setBackgroundColor(getShowColor(courseData.color));
                                 body.addView(card);
                                 body.setTag(courseData);
                                 body.setOnClickListener(new View.OnClickListener() {
@@ -257,13 +257,13 @@ public class KcbFragment extends Fragment {
                                 //设置文本布局和内容
                                 textView = new TextView(context);
                                 textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-                                textView.setTextColor(context.getColor(R.color.show_blue1));
+                                textView.setTextColor(getTextColor(courseData.color));
                                 String str = courseData.name+"\n";
                                 if(courseData.classroom!=null) str += courseData.classroom+"\n";
                                 if(courseData.teacher!=null) str += courseData.teacher;
                                 textView.setText(str);
                                 textView.setGravity(Gravity.CENTER);
-                                textView.setTextSize(15);
+                                textView.setTextSize(13);
                                 card.addView(textView);
                                 k+=courseData.sum-1;//加上所占的课程 但是本身还++了所以要-1
                                 break;
@@ -330,8 +330,9 @@ public class KcbFragment extends Fragment {
             }
         }
     }
-    // todo 添加课程的点击事件
+    //  添加课程的点击事件
     private void addCourse(View view){
+        //第二次点击
         if(selectLinearLayout == (LinearLayout) view){
             //跳转
             Intent intent = new Intent(context,SettingCourse.class);
@@ -341,6 +342,7 @@ public class KcbFragment extends Fragment {
             intent.putExtra("isAdd",true);
             startActivityForResult(intent,666);
         }
+        //第一次点击
         else{
             Toast.makeText(context,"再次点击添加课程",Toast.LENGTH_SHORT).show();
             if(selectLinearLayout!=null) selectLinearLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.solid));
@@ -349,8 +351,9 @@ public class KcbFragment extends Fragment {
             view.setBackgroundColor(ContextCompat.getColor(context,R.color.cyan_bg));
         }
     }
-    //todo 编辑现有课程
+    // 编辑现有课程的点击事件
     private void editCourse(View view){
+        //第二次点击
         if(selectLinearLayout == (LinearLayout) view){
 
             Intent intent = new Intent(context,SettingCourse.class);
@@ -364,8 +367,11 @@ public class KcbFragment extends Fragment {
             intent.putExtra("classroom",dt.classroom);
             intent.putExtra("week",dt.week);
             intent.putExtra("period",dt.period);
+            intent.putExtra("color",dt.color);
+
             startActivityForResult(intent,666);
         }
+        //第一次点击
         else{
             Toast.makeText(context,"再次点击编辑课程",Toast.LENGTH_SHORT).show();
             selectLinearLayout = (LinearLayout) view;
@@ -441,15 +447,11 @@ public class KcbFragment extends Fragment {
         tittle.setText("第"+nowWeek+"周");
     }
 
-    //删除所有课程展示卡
-    private void delClassCard() {
-
-    }
 
     //课程数据类
     private class courseDataClass {
-        public String name, teacher, classroom, week, color;
-        public int beginTime,sum,period,id;
+        public String name, teacher, classroom, week;
+        public int beginTime,sum,period,id,color;
     }
 
     //从cursor中获取课程信息 todo 有bug重叠课程 应该改用id才行
@@ -457,7 +459,7 @@ public class KcbFragment extends Fragment {
         courseDataClass course = new courseDataClass();
         course.beginTime = cursor.getInt(cursor.getColumnIndexOrThrow("begintime"));
         course.sum = cursor.getInt(cursor.getColumnIndexOrThrow("sum"));
-        course.color = cursor.getString(cursor.getColumnIndexOrThrow("color"));
+        course.color = cursor.getInt(cursor.getColumnIndexOrThrow("color"));
         course.classroom = cursor.getString(cursor.getColumnIndexOrThrow("classroom"));
         course.week = cursor.getString(cursor.getColumnIndexOrThrow("week"));
         course.name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
@@ -522,5 +524,38 @@ public class KcbFragment extends Fragment {
         return (int) (dpValue * scale + 0.5f);
     }
 
-
+    //获取背景展示的颜色对应的int
+    private int getShowColor(int a){
+        switch (a){
+            case 1:
+                return context.getColor(R.color.show1);
+            case 2:
+                return context.getColor(R.color.show2);
+            case 3:
+                return context.getColor(R.color.show3);
+            case 4:
+                return context.getColor(R.color.show4);
+            case 5:
+                return context.getColor(R.color.show5);
+            default:
+                return context.getColor(R.color.show6);
+        }
+    }
+    //获取文字展示的颜色对应的int
+    private int getTextColor(int a){
+        switch (a){
+            case 1:
+                return context.getColor(R.color.text1);
+            case 2:
+                return context.getColor(R.color.text2);
+            case 3:
+                return context.getColor(R.color.text3);
+            case 4:
+                return context.getColor(R.color.text4);
+            case 5:
+                return context.getColor(R.color.text5);
+            default:
+                return context.getColor(R.color.text6);
+        }
+    }
 }

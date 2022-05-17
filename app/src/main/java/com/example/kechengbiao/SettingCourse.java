@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SettingCourse extends AppCompatActivity {
 
@@ -108,50 +110,60 @@ public class SettingCourse extends AppCompatActivity {
             }
         }
         isAdd = intent.getBooleanExtra("isAdd",false);
-
+        //设置
         //如果是添加新的课程
         if(isAdd){
-            dt.beginTime = intent.getIntExtra("beginTime",0);
-            dt.period = intent.getIntExtra("period",0);
-            dt.sum = 1;
-            courseTime.setText(dt.beginTime+"-"+dt.beginTime);
-            allWeek.setChecked(true);
-            dt.week = "";
-            for (int j = 0; j < weekSum; j++) {
-                dt.week += "1";
-            }
-
+            initAdd(intent);
         }//如果是编辑已有的课程
         else{
-            dt.beginTime = intent.getIntExtra("beginTime",0);
-            dt.sum = intent.getIntExtra("sum",0);
-            dt.id = intent.getIntExtra("id",0);
-            dt.name = intent.getStringExtra("name");
-            dt.teacher = intent.getStringExtra("teacher");
-            dt.classroom = intent.getStringExtra("classroom");
-            dt.week = intent.getStringExtra("week");
-            dt.period = intent.getIntExtra("period",0);
-            Log.d(TAG, "onCreate: "+dt.period);
-            classroom.setText(dt.teacher);
-            teacher.setText(dt.teacher);
-            courseName.setText(dt.name);
-            courseTime.setText(dt.beginTime+"-"+(dt.beginTime+dt.sum-1));
-
-            for (int i = 0; i < weekSum; i++) {
-                if(dt.week.substring(i,i+1).equals("1")){
-                    selectWeekList.get(i).setChecked(true);
-                }
-                else{
-                    selectWeekList.get(i).setChecked(false);
-                }
-            }
-
+            initEdit(intent);
         }
     }
+    //如果是添加新的课程的初始化
+    void initAdd(Intent intent){
+        dt.beginTime = intent.getIntExtra("beginTime",0);
+        dt.period = intent.getIntExtra("period",0);
+        dt.sum = 1;
+        courseTime.setText(dt.beginTime+"-"+dt.beginTime);
+        allWeek.setChecked(true);
+        dt.week = "";
+        for (int j = 0; j < weekSum; j++) {
+            dt.week += "1";
+        }
+        //随机取个颜色
+        Random random = new Random();
+        colorSelectList.get(random.nextInt(6)).setChecked(true);
+    }
+    //如果是编辑已有的课程的初始化
+    void initEdit(Intent intent){
+        dt.beginTime = intent.getIntExtra("beginTime",0);
+        dt.sum = intent.getIntExtra("sum",0);
+        dt.id = intent.getIntExtra("id",0);
+        dt.name = intent.getStringExtra("name");
+        dt.teacher = intent.getStringExtra("teacher");
+        dt.classroom = intent.getStringExtra("classroom");
+        dt.week = intent.getStringExtra("week");
+        dt.period = intent.getIntExtra("period",0);
+        classroom.setText(dt.classroom);
+        teacher.setText(dt.teacher);
+        courseName.setText(dt.name);
+        courseTime.setText(dt.beginTime+"-"+(dt.beginTime+dt.sum-1));
+        dt.color = intent.getIntExtra("color",1);
+        colorSelectList.get(dt.color-1).setChecked(true);
+        for (int i = 0; i < weekSum; i++) {
+            if(dt.week.substring(i,i+1).equals("1")){
+                selectWeekList.get(i).setChecked(true);
+            }
+            else{
+                selectWeekList.get(i).setChecked(false);
+            }
+        }
 
-
+    }
 
     int monitorBegin,monitorEnd;//接受滑动选择框的返回值
+    ArrayList<RadioButton> colorSelectList;
+    RadioGroup rg_color;
     //获取界面UI控件 并且绑定部分点击事件
     private void getUI(){
         classroom = findViewById(R.id.et_classroom);
@@ -316,8 +328,98 @@ public class SettingCourse extends AppCompatActivity {
 
             }
         });
+        colorSelectList = new ArrayList<>();
+        colorSelectList.add(findViewById(R.id.color1));
+        GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(0).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(1));
+        colorSelectList.add(findViewById(R.id.color2));
+        gradientDrawable = (GradientDrawable) colorSelectList.get(1).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(2));
+        colorSelectList.add(findViewById(R.id.color3));
+        gradientDrawable = (GradientDrawable) colorSelectList.get(2).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(3));
+        colorSelectList.add(findViewById(R.id.color4));
+        gradientDrawable = (GradientDrawable) colorSelectList.get(3).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(4));
+        colorSelectList.add(findViewById(R.id.color5));
+        gradientDrawable = (GradientDrawable) colorSelectList.get(4).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(5));
+        colorSelectList.add(findViewById(R.id.color6));
+        gradientDrawable = (GradientDrawable) colorSelectList.get(5).getBackground().getCurrent();
+        gradientDrawable.setColor(getShowColor(6));
+        rg_color = findViewById(R.id.rg_color);
+        rg_color.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == colorSelectList.get(0).getId()){
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(0).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(1));
+                    dt.color = 1;
+                }
+                else if(checkedId == colorSelectList.get(1).getId()){
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(1).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(2));
+                    dt.color = 2;
+                }
+                else if(checkedId == colorSelectList.get(2).getId()){
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(2).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(3));
+                    dt.color = 3;
+                }
+                else if(checkedId == colorSelectList.get(3).getId()){
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(3).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(4));
+                    dt.color = 4;
+                }
+                else if(checkedId == colorSelectList.get(4).getId()){
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(4).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(5));
+                    dt.color = 5;
+                }
+                else{
+                    GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(5).getBackground().getCurrent();
+                    gradientDrawable.setColor(getShowColor(6));
+                    dt.color = 6;
+                }
+            }
+
+        });
     }
 
+    //获取背景展示的颜色对应的int
+    private int getShowColor(int a){
+        switch (a){
+            case 1:
+                return context.getColor(R.color.show1);
+            case 2:
+                return context.getColor(R.color.show2);
+            case 3:
+                return context.getColor(R.color.show3);
+            case 4:
+                return context.getColor(R.color.show4);
+            case 5:
+                return context.getColor(R.color.show5);
+            default:
+                return context.getColor(R.color.show6);
+        }
+    }
+    //获取文字展示的颜色对应的int
+    private int getTextColor(int a){
+        switch (a){
+            case 1:
+                return context.getColor(R.color.text1);
+            case 2:
+                return context.getColor(R.color.text2);
+            case 3:
+                return context.getColor(R.color.text3);
+            case 4:
+                return context.getColor(R.color.text4);
+            case 5:
+                return context.getColor(R.color.text5);
+            default:
+                return context.getColor(R.color.text6);
+        }
+    }
 
     //滑动选择框的数据初始化
     ArrayList<String> bj = new ArrayList<>();
@@ -328,8 +430,8 @@ public class SettingCourse extends AppCompatActivity {
     }
     //课程数据类
     private class courseDataClass {
-        public String name, teacher, classroom, week, color;
-        public int beginTime,sum,period ,id;
+        public String name, teacher, classroom, week;
+        public int beginTime,sum,period ,id,color;
     }
 
 
