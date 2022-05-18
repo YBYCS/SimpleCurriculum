@@ -22,7 +22,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 
@@ -31,7 +33,6 @@ public class KcbFragment extends Fragment {
     private DBOpenHelper dbOpenHelper;
     private SQLiteDatabase db;
     private int selectWeek;//记录是第几周
-    private Fragment fragment;
     private View view;
     private Context context;
     private int msum, asum, esum,weekSum;
@@ -53,22 +54,52 @@ public class KcbFragment extends Fragment {
         context = getActivity();
         dbOpenHelper = new DBOpenHelper(context, "data.db", null, 1);
         db = dbOpenHelper.getWritableDatabase();
-        Log.d(TAG, "onCreateView: 1");
+        getInitData();
         initButton();
         getContainer();
-        getInitData();
         initTimeShow();
         addClassCard();
         return view;
     }
-    //获取数据库数据 todo 这里的数据如果在主activity获取再读取主activity可能会优化
+    //获取数据库数据
     private void getInitData(){
         //获取有多少节课
-        Cursor cursor ;
-        msum = activity.msum;
-        esum = activity.esum;
-        asum = activity.asum;
-        weekSum = activity.weekSum;
+        Cursor cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"msum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        msum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"asum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        asum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"esum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        esum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"weeksum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        weekSum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
         //获取每节课时间是否固定
         cursor = db.query("setting",
                 null,
@@ -85,6 +116,133 @@ public class KcbFragment extends Fragment {
 
     }
 
+    //获取展示课程容器控件
+    private void getContainer(){
+        ml_list.add(view.findViewById(R.id.MonMorning));
+        ml_list.add(view.findViewById(R.id.TueMorning));
+        ml_list.add(view.findViewById(R.id.WebMorning));
+        ml_list.add(view.findViewById(R.id.ThuMorning));
+        ml_list.add(view.findViewById(R.id.FriMorning));
+
+        al_list.add(view.findViewById(R.id.MonAfternoon));
+        al_list.add(view.findViewById(R.id.TueAfternoon));
+        al_list.add(view.findViewById(R.id.WebAfternoon));
+        al_list.add(view.findViewById(R.id.ThuAfternoon));
+        al_list.add(view.findViewById(R.id.FriAfternoon));
+
+        el_list.add(view.findViewById(R.id.MonEvening));
+        el_list.add(view.findViewById(R.id.TueEvening));
+        el_list.add(view.findViewById(R.id.WebEvening));
+        el_list.add(view.findViewById(R.id.ThuEvening));
+        el_list.add(view.findViewById(R.id.FriEvening));
+
+        firstDay = activity.firstDay;
+        Calendar now = Calendar.getInstance();
+        nowDay = now.get(Calendar.DAY_OF_MONTH);
+        nowMonth = now.get(Calendar.MONTH);
+        nowYear = now.get(Calendar.YEAR);
+        firstDay.add(Calendar.DATE,(selectWeek-1)*7);
+        TextView textView = view.findViewById(R.id.Monday);
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+        textView.setText("周一\n"+format.format(firstDay.getTime()));
+        //如果是今天 改变颜色
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView = view.findViewById(R.id.Tuesday);
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周二\n"+format.format(firstDay.getTime()));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView = view.findViewById(R.id.Wednesday);
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周三\n"+format.format(firstDay.getTime()));
+        Log.d(TAG, "getContainer: "+(firstDay.get(Calendar.MONTH)==nowMonth));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView = view.findViewById(R.id.Thursday);
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周四\n"+format.format(firstDay.getTime()));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView = view.findViewById(R.id.Friday);
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周五\n"+format.format(firstDay.getTime()));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        if(isShowWeekend){
+            addWeekendWidget();
+        }
+    }
+
+    Calendar firstDay;//用来计算这周的日期
+    int nowDay,nowMonth,nowYear;
+    //添加周末的控件
+    void addWeekendWidget(){
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+
+        LinearLayout linearLayout = view.findViewById(R.id.head_time);
+        TextView textView = new TextView(context);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,2));
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周六\n"+format.format(firstDay.getTime()));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView.setTextSize(10);
+
+        textView.setGravity(Gravity.CENTER);
+        linearLayout.addView(textView);
+        textView = new TextView(context);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,2));
+        firstDay.add(Calendar.DATE,1);
+        textView.setText("周日\n"+format.format(firstDay.getTime()));
+        if(firstDay.get(Calendar.DAY_OF_MONTH)==nowDay&&firstDay.get(Calendar.MONTH)==nowMonth&&firstDay.get(Calendar.YEAR)==nowYear){
+            textView.setTextColor(context.getColor(R.color.blue3));
+        }
+        textView.setTextSize(10);
+        textView.setGravity(Gravity.CENTER);
+        linearLayout.addView(textView);
+
+        linearLayout = view.findViewById(R.id.morningContainer);
+        LinearLayout container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        ml_list.add(container);
+        container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        ml_list.add(container);
+        linearLayout = view.findViewById(R.id.afternoonContainer);
+        container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        al_list.add(container);
+        container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        al_list.add(container);
+        linearLayout = view.findViewById(R.id.eveningContainer);
+        container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        el_list.add(container);
+        container = new LinearLayout(context);
+        container.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,2));
+        container.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(container);
+        el_list.add(container);
+
+    }
 
     //生成展示课程时间卡
     private void initTimeShow(){
@@ -95,7 +253,7 @@ public class KcbFragment extends Fragment {
             //设置布局
             card = new LinearLayout(context);
             card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    dip2px(context,60)));
+                    dip2px(context,50)));
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackground(context.getDrawable(R.drawable.solid));
             card.setGravity(Gravity.CENTER);
@@ -105,7 +263,7 @@ public class KcbFragment extends Fragment {
             textView.setText(String.valueOf(i));
             textView.setTextColor(getResources().getColor(R.color.blackOfShow));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(14);
+            textView.setTextSize(12);
             card.addView(textView);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -113,7 +271,7 @@ public class KcbFragment extends Fragment {
                     getBeginHour(String.valueOf(10+i)),getBeginMinute(String.valueOf(10+i)),getEndHour(String.valueOf(10+i)),getEndMinute(String.valueOf(10+i))));
             textView.setTextColor(getResources().getColor(R.color.gray));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(12);
+            textView.setTextSize(11);
             card.addView(textView);
 
         }
@@ -122,16 +280,17 @@ public class KcbFragment extends Fragment {
             //设置布局
             card = new LinearLayout(context);
             card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    dip2px(context,60)));
+                    dip2px(context,50)));
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackground(context.getDrawable(R.drawable.solid));
+            card.setGravity(Gravity.CENTER);
             container.addView(card);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
             textView.setText(String.valueOf(i+msum));
             textView.setTextColor(getResources().getColor(R.color.blackOfShow));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(14);
+            textView.setTextSize(12);
             card.addView(textView);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -139,7 +298,7 @@ public class KcbFragment extends Fragment {
                     getBeginHour(String.valueOf(20+i)),getBeginMinute(String.valueOf(20+i)),getEndHour(String.valueOf(20+i)),getEndMinute(String.valueOf(20+i))));
             textView.setTextColor(getResources().getColor(R.color.gray));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(12);
+            textView.setTextSize(11);
             card.addView(textView);
 
         }
@@ -148,24 +307,26 @@ public class KcbFragment extends Fragment {
             //设置布局
             card = new LinearLayout(context);
             card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    dip2px(context,60)));
+                    dip2px(context,50)));
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackground(context.getDrawable(R.drawable.solid));
+            card.setGravity(Gravity.CENTER);
             container.addView(card);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
             textView.setText(String.valueOf(i+msum+asum));
             textView.setTextColor(getResources().getColor(R.color.blackOfShow));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(14);
+            textView.setTextSize(12);
             card.addView(textView);
             textView = new TextView(context);
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            Log.d(TAG, "initTimeShow: "+esum);
             textView.setText(String.format(Locale.CHINA,"%02d:%02d\n%02d:%02d",
                     getBeginHour(String.valueOf(30+i)),getBeginMinute(String.valueOf(30+i)),getEndHour(String.valueOf(30+i)),getEndMinute(String.valueOf(30+i))));
             textView.setTextColor(getResources().getColor(R.color.gray));
             textView.setGravity(Gravity.CENTER);
-            textView.setTextSize(12);
+            textView.setTextSize(11);
             card.addView(textView);
 
         }
@@ -234,11 +395,9 @@ public class KcbFragment extends Fragment {
                                 //设置布局
                                 card = new LinearLayout(context);
                                 body.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                        dip2px(context,60)*courseData.sum));
+                                        dip2px(context,50)*courseData.sum));
                                 body.setOrientation(LinearLayout.VERTICAL);
                                 body.setBackground(ContextCompat.getDrawable(context,R.drawable.solid));
-                                //LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)body.getLayoutParams();
-                                //layoutParams.setMargins(dip2px(context,1),dip2px(context,1),dip2px(context,1),dip2px(context,1));
                                 body.setPadding(dip2px(context,3),dip2px(context,3),dip2px(context,3),dip2px(context,3));
                                 card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.MATCH_PARENT));
@@ -275,7 +434,7 @@ public class KcbFragment extends Fragment {
                             //设置布局
                             card = new LinearLayout(context);
                             card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    dip2px(context,60)));
+                                    dip2px(context,50)));
                             card.setOrientation(LinearLayout.VERTICAL);
                             card.setBackground(ContextCompat.getDrawable(context,R.drawable.solid));
                             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)card.getLayoutParams();
@@ -303,7 +462,7 @@ public class KcbFragment extends Fragment {
                         //设置布局
                         card = new LinearLayout(context);
                         card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                dip2px(context,60)));
+                                dip2px(context,50)));
                         card.setOrientation(LinearLayout.VERTICAL);
                         card.setBackground(ContextCompat.getDrawable(context,R.drawable.solid));
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)card.getLayoutParams();
@@ -385,36 +544,12 @@ public class KcbFragment extends Fragment {
         if (resultCode==0&&requestCode==666){
             //处理回调相关操作 todo
             Log.d(TAG, "onActivityResult: 1");
-            activity.reLoadKcb(selectWeek);
+            activity.reFragment(selectWeek);
         }
     }
 
 
-    //获取展示课程容器控件
-    private void getContainer(){
-        ml_list.add(view.findViewById(R.id.MonMorning));
-        ml_list.add(view.findViewById(R.id.TueMorning));
-        ml_list.add(view.findViewById(R.id.WebMorning));
-        ml_list.add(view.findViewById(R.id.ThuMorning));
-        ml_list.add(view.findViewById(R.id.FriMorning));
 
-        al_list.add(view.findViewById(R.id.MonAfternoon));
-        al_list.add(view.findViewById(R.id.TueAfternoon));
-        al_list.add(view.findViewById(R.id.WebAfternoon));
-        al_list.add(view.findViewById(R.id.ThuAfternoon));
-        al_list.add(view.findViewById(R.id.FriAfternoon));
-
-        el_list.add(view.findViewById(R.id.MonEvening));
-        el_list.add(view.findViewById(R.id.TueEvening));
-        el_list.add(view.findViewById(R.id.WebEvening));
-        el_list.add(view.findViewById(R.id.ThuEvening));
-        el_list.add(view.findViewById(R.id.FriEvening));
-
-        //Todo 动态添加周末的控件
-        if(isShowWeekend){
-
-        }
-    }
 
     private void initButton(){
         nextWeek = view.findViewById(R.id.NextWeek);
@@ -424,7 +559,7 @@ public class KcbFragment extends Fragment {
             public void onClick(View view) {
                 if(selectWeek <weekSum){
                     Log.d(TAG, "onClick: "+selectWeek);
-                    activity.reLoadKcb(selectWeek +1);
+                    activity.reFragment(selectWeek +1);
                 }
                 else{
                     Toast.makeText(context,"已经是最后一周惹",Toast.LENGTH_SHORT).show();
@@ -437,7 +572,7 @@ public class KcbFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(selectWeek >1){
-                    activity.reLoadKcb(selectWeek -1);
+                    activity.reFragment(selectWeek -1);
                 }
                 else{
                     Toast.makeText(context,"前方是虚空",Toast.LENGTH_SHORT).show();

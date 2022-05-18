@@ -39,13 +39,15 @@
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
+
                 <TextView
+                    android:id="@+id/tv_semester_begin_time"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="时间 >"
-                    android:textSize="15sp"
+                    android:layout_alignParentEnd="true"
                     android:gravity="center"
-                    android:layout_alignParentEnd="true"/>
+                    android:text="时间"
+                    android:textSize="15sp" />
             </RelativeLayout>
             <RelativeLayout
                 android:orientation="horizontal"
@@ -64,13 +66,15 @@
                     android:textColor="@color/black"
                     android:textStyle="bold"
                     android:layout_alignParentStart="true"/>
+
                 <TextView
+                    android:id="@+id/tv_week_sum"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="周数 >"
-                    android:textSize="15sp"
+                    android:layout_alignParentEnd="true"
                     android:gravity="center"
-                    android:layout_alignParentEnd="true"/>
+                    android:text="周数"
+                    android:textSize="15sp" />
             </RelativeLayout>
             <RelativeLayout
                 android:orientation="horizontal"
@@ -136,6 +140,32 @@
                     android:layout_alignParentStart="true"
                     android:gravity="center"
                     android:text="课表时间设置"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text=" >"
+                    android:textSize="15sp"
+                    android:gravity="center"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:id="@+id/startNewSemester"
+                android:layout_height="60dp"
+
+                android:paddingHorizontal="10dp"
+                android:background="@drawable/click_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center"
+                    android:text="开启新学期"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />

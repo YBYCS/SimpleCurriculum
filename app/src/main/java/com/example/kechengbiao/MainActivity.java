@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         db = dbOpenHelper.getWritableDatabase();
         calendar = Calendar.getInstance();
         initNowWeek();
+        selectWeek = nowWeek;//默认选择的周就是当前周
         initUI();
         getInitData();
     }
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    //初始化现在是第几周
     private void initNowWeek(){
         //获取开学时间
         int starYear,starDay,starMonth;
@@ -107,30 +109,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         beginDateStr = starYear+"-";
         beginDateStr += (starMonth<10?"0"+starMonth:String.valueOf(starMonth))+"-";
         beginDateStr += (starDay<10?"0"+starDay:String.valueOf(starDay));
-        Log.d(TAG, "initNowWeek: "+beginDateStr);
         starDay = calendar.get(Calendar.DAY_OF_MONTH);
         starMonth = calendar.get(Calendar.MONTH)+1; //从0开始
         starYear = calendar.get(Calendar.YEAR);
         endDateStr = starYear+"-";
         endDateStr += (starMonth<10?"0"+starMonth:String.valueOf(starMonth))+"-";
         endDateStr += (starDay<10?"0"+starDay:String.valueOf(starDay));
-        Log.d(TAG, "initNowWeek: "+endDateStr);
 
         long day = 0;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date beginDate;
         Date endDate;
+
+        firstDay = Calendar.getInstance();
+
         try {
+
             beginDate = format.parse(beginDateStr);
             endDate = format.parse(endDateStr);
-            day = (endDate.getTime()-beginDate.getTime())/(24*60*60*1000);
+            //获取开学时间是周几 进行偏移计算
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(beginDate);
+            int week = cal.get(Calendar.DAY_OF_WEEK);
+            week = week==1? 7:week-1;
+            day = (endDate.getTime()-beginDate.getTime())/(24*60*60*1000) +week-1;//调整为开学周的周一那一天 -1是为了求模的时候算对
+            firstDay.setTime(beginDate);
+            firstDay.add(Calendar.DATE,1-week);
         } catch (ParseException e) {
+
             e.printStackTrace();
         }
-        selectWeek = (int) day/7+1;
-        nowWeek = selectWeek;
-
+        nowWeek = (int) day/7+1;
     }
+
+    public Calendar firstDay;//开学那一周的周一是什么时候
+
     //显示框架的代码 用于切换界面
     private void showFragment1(){
         //开启事务
@@ -224,13 +237,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //重新载入课程表 todo 和今日课程
-    public void reLoadKcb(int theWeek){
+    //重新载入课程表 和今日课程 来响应设置的修改
+    public void reFragment(int theWeek){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         selectWeek = theWeek;
         //删除fragment
-        getSupportFragmentManager().beginTransaction().remove(fragment_2).commit();
-        fragment_2 = null;
-        showFragment2();
+        if(fragment_2!=null){
+            transaction.remove(fragment_2);
+            fragment_2 = new KcbFragment();
+            transaction.add(R.id.content_layout,fragment_2);
+        }
+        if(fragment_1!=null){
+            transaction.remove(fragment_1);
+            fragment_1 = new TodayFragment();
+            transaction.add(R.id.content_layout,fragment_1);
+        }
+        transaction.commit();
+        initNowWeek();
+    }
+    //重载 如果不传参数 则按当前的周来更改
+    public void reFragment(){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        initNowWeek();
+        selectWeek = nowWeek;
+        //删除fragment
+        if(fragment_2!=null){
+            transaction.remove(fragment_2);
+            fragment_2 = new KcbFragment();
+            transaction.add(R.id.content_layout,fragment_2);
+        }
+        if(fragment_1!=null){
+            transaction.remove(fragment_1);
+            fragment_1 = new TodayFragment();
+            transaction.add(R.id.content_layout,fragment_1);
+        }
+        transaction.commit();
+
     }
 
     //获取数据库数据

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.Calendar;
+
 //重写SQLiteOpenHelper类
 public class DBOpenHelper extends SQLiteOpenHelper {
 
@@ -35,17 +37,21 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     //创建设置表单 为设置名称和设置状态
     private void initSetting(){
         //创建设置表单 为设置名称和设置状态
-        sql = "create table setting(id integer primary key autoincrement,name char(20),state integar)";
+        sql = "create table setting(id integer primary key autoincrement,name char(100),state integar)";
         db.execSQL(sql);
+        Calendar calendar =Calendar.getInstance();
         //初始化表单,填入相关参数
         //开学时间
         values.put("name","year");
+        values.put("state",calendar.get(Calendar.YEAR));
         db.insert("setting",null , values);
         values.clear();
         values.put("name","month");
+        values.put("state",calendar.get(Calendar.MONTH)+1);
         db.insert("setting",null , values);
         values.clear();
         values.put("name","day");
+        values.put("state",calendar.get(Calendar.DAY_OF_MONTH));
         db.insert("setting",null , values);
         values.clear();
         //目前第几周
@@ -89,6 +95,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         //课间休息时间
         values.put("name","restduration");
         values.put("state","10");
+        db.insert("setting",null , values);
+        values.clear();
+        //标语
+        values.put("name","slogan");
+        values.put("state","岁寒,然后知松柏之后凋");
         db.insert("setting",null , values);
         values.clear();
         //上面是设置表单的初始化

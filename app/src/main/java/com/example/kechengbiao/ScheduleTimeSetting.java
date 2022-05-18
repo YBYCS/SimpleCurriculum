@@ -1,11 +1,9 @@
 package com.example.kechengbiao;
 
-import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import android.util.Log;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,17 +13,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-
+//设置每节课是什么时候上课的
 public class ScheduleTimeSetting extends AppCompatActivity {
     private DBOpenHelper dbOpenHelper;
     private SQLiteDatabase db;
@@ -467,11 +463,11 @@ public class ScheduleTimeSetting extends AppCompatActivity {
         alert = builder.create();
 
         //取消按钮
-        outView.findViewById(R.id.bt_schedule_time_cancel).setOnClickListener((View v)-> alert.dismiss());
+        outView.findViewById(R.id.cancel).setOnClickListener((View v)-> alert.dismiss());
 
-        outView.findViewById(R.id.bt_schedule_time_confirm).setTag(number);
+        outView.findViewById(R.id.confirm).setTag(number);
         //确定按钮
-        outView.findViewById(R.id.bt_schedule_time_confirm).setOnClickListener(new View.OnClickListener() {
+        outView.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 storeScheduleData(bhSelectText,bmSelectText,ehSelectText,emSelectText,String.valueOf(number));

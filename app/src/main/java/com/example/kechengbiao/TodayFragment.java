@@ -2,6 +2,8 @@ package com.example.kechengbiao;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,28 +42,66 @@ public class TodayFragment extends Fragment {
         //创建Fragment的布局
         View view = inflater.inflate(R.layout.fragment_today,container,false);
         activity = (MainActivity)getActivity();
-        this.view = view;
+        context = (Context) getActivity();
         nowWeek = activity.selectWeek;
         calendar = Calendar.getInstance();
         period = calendar.get(Calendar.DAY_OF_WEEK);
-        getInitData();
         if(period==0)period=7;
         else period-=1;
-        context = (Context) getActivity();
+        dbOpenHelper = new DBOpenHelper(context, "data.db", null, 1);
+        db = dbOpenHelper.getWritableDatabase();
+        this.view = view;
+        getInitData();
         initTittle();
         addCard();
         return view;
     }
     private void initTittle(){
         tv_date = view.findViewById(R.id.date_tittle);
-        tv_date.setText("今天是星期"+convertDayOfWeek(period));
-        //todo 这里可以设置点击事件来修改标语
-        //tv_tittle = view.findViewById(R.id.tittle);
+        tv_date.setText("今天是第"+nowWeek+"周,星期"+convertDayOfWeek(period));
+        tv_tittle = view.findViewById(R.id.tittle);
+        Cursor cursor = db.query("setting",null,"name=?",new String[]{"slogan"},null,null,null);
+        cursor.moveToFirst();
+        tv_tittle.setText(cursor.getString(cursor.getColumnIndexOrThrow("state")));
+        tv_tittle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View outerView = LayoutInflater.from(context).inflate(R.layout.dialog_edit,null);
+                TextView textView = outerView.findViewById(R.id.tittle);
+                textView.setText("修改标语");
+                AlertDialog alertDialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setView(outerView);
+                builder.setCancelable(false);//点击返回键是否可以返回 默认true
+                alertDialog = builder.create();
+                //设置布局中的取消按钮
+                outerView.findViewById(R.id.bt_cancel).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                });
+                //设置确定按钮
+                outerView.findViewById(R.id.bt_confirm).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ContentValues values = new ContentValues();
+                        String data;
+                        EditText editText =  view.findViewById(R.id.et_content);
+                        data = editText.getText().toString();
+                        values.put("state",data);
+                        db.update("setting",values,"name=?",new String[]{"slogan"});
+                        tv_tittle.setText(data);
+                        alertDialog.dismiss();
+                    }
+                });
+                alertDialog.show();
+            }
+        });
     }
     //添加每日的课程
     private void addCard(){
-        dbOpenHelper = new DBOpenHelper(context, "data.db", null, 1);
-        db = dbOpenHelper.getWritableDatabase();
+
         LinearLayout linearLayout;
         linearLayout = view.findViewById(R.id.morning_course_container);
         for (int i = 0; i < msum; i++) {
@@ -100,6 +141,7 @@ public class TodayFragment extends Fragment {
                         View v = new View(context);
                         v.setLayoutParams(new LinearLayout.LayoutParams(dip2px(context,4), dip2px(context,35)));
                         v.setBackground(context.getDrawable(R.drawable.circular_light_sky_blue));
+
                         card.addView(v);
 
                         //添加右边的信息
@@ -282,10 +324,43 @@ public class TodayFragment extends Fragment {
 
     //获取数据库数据 todo 这里的数据如果在主activity获取再读取主activity可能会优化
     private void getInitData(){
-        msum = activity.msum;
-        esum = activity.esum;
-        asum = activity.asum;
-        weekSum = activity.weekSum;
+        //获取有多少节课
+        Cursor cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"msum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        msum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"asum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        asum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"esum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        esum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        cursor = db.query("setting",
+                null,
+                "name=?",
+                new String[]{"weeksum"},
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        weekSum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
     }
     //课程数据类
     private class courseDataClass {

@@ -91,7 +91,7 @@
             android:layout_weight="1"
             android:gravity="center">
             <Button
-                android:id="@+id/bt_schedule_time_cancel"
+                android:id="@+id/cancel"
                 android:layout_width="150dp"
                 android:layout_height="60dp"
                 android:text="取消"
@@ -105,7 +105,7 @@
             android:layout_weight="1"
             android:gravity="center">
             <Button
-                android:id="@+id/bt_schedule_time_confirm"
+                android:id="@+id/confirm"
                 android:layout_width="150dp"
                 android:layout_height="60dp"
                 android:background="@drawable/confirm_button"
