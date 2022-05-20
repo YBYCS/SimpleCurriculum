@@ -3,10 +3,6 @@
 该有的功能都具备了 因为砍掉了一些我个人认为不怎么用得到的功能 所以响应速度会快很多  
 本人只学了差不多一周的android开发所以代码可能不太优美(所以也不会很难)  
 推荐阅读顺序是 设置 课程表 今日课程 每一段代码我差不多都注释了 
-# 剩余的小细节
-1. 设置保存后的重启
-2. 删除课程数据
-3. 数据合法性验证
 # 效果展示
 ![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/today.jpg)  
 ![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/kcb.jpg)  
