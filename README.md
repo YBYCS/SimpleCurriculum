@@ -32,7 +32,7 @@ isfixedtime
 courseduration一节课时间
 restduration课间时间
 
-## 课程时间设置表
+### 课程时间设置表
 
 courseschedule 同上 name 和state
 
@@ -44,7 +44,7 @@ courseschedule 同上 name 和state
 
 4. 结束时间 endhour endminute
 
-## 课程数据表
+### 课程数据表
 
 coursedata 以下是各列名称
 
