@@ -56,6 +56,7 @@ public class TodayFragment extends Fragment {
         addCard();
         return view;
     }
+    //初始化标题
     private void initTittle(){
         tv_date = view.findViewById(R.id.date_tittle);
         tv_date.setText("今天是第"+nowWeek+"周,星期"+convertDayOfWeek(period));
@@ -446,10 +447,8 @@ public class TodayFragment extends Fragment {
                 return  "五";
             case 6:
                 return  "六";
-            case 7:
-                return  "日";
             default:
-                return "零";
+                return "日";
         }
     }
 }

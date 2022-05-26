@@ -590,7 +590,7 @@ public class KcbFragment extends Fragment {
         public int beginTime,sum,period,id,color;
     }
 
-    //从cursor中获取课程信息 todo 有bug重叠课程 应该改用id才行
+    //从cursor中获取课程信息
     private courseDataClass getCourseData(Cursor cursor){
         courseDataClass course = new courseDataClass();
         course.beginTime = cursor.getInt(cursor.getColumnIndexOrThrow("begintime"));

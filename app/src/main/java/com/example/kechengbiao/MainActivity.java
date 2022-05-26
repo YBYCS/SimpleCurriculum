@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
         nowWeek = (int) day/7+1;
+
     }
 
     public Calendar firstDay;//开学那一周的周一是什么时候
