@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="true">
+        <shape>
+
+            <!-- 这里是设置背景色-->
+            <solid android:color="@color/bt_blue" />
+
+            <!-- 这里是设置为四周 也可以单独设置某个位置为圆角-->
+            <corners android:radius="100dp" />
+            <!-- 这里设置边框 -->
+            <stroke android:width="1dp" android:color="@color/bt_blue" />
+        </shape>
+    </item>
+
+    <item android:state_enabled="false">
+        <shape>
+            <!-- 这里是设置背景色-->
+            <solid android:color="@color/darkGray" />
+            <!-- 这里是设置为四周 也可以单独设置某个位置为圆角-->
+            <corners android:radius="100dp" />
+            <!-- 这里设置边框 -->
+            <stroke android:width="1dp" android:color="@color/darkGray" />
+        </shape>
+    </item>
+
+
+
+</selector>
