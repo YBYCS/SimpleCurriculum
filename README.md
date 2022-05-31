@@ -8,6 +8,10 @@
 2. 添加更多颜色选择
 3. 课程展示改为滑动(其实一开始以为这个是小爱同学响应慢的原因所以改了 但是判断可能不是 而是网络连接? 代考证)
 4. 数据合法性验证
+# 后期修复
+1. 修复了颜色位置问题
+2. 修复了修改学期周数后导致的数组越界问题并且添加了自动补充课程的功能
+3. 修复了课表节数相关bug
 # 一些解释
 ## sqlite相关数据
 数据库名称:data.db
@@ -64,6 +68,11 @@ week字符串对应
 color展示颜色
 
 period 时期编码  两位数 分别对应星期几和时间段
+
+isOddWeek是否为单周(调整周数时自动补全)
+
+isDoubleWeek是否为双周(全选就是单双周都为1)
+
 # 效果展示
 ![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/today.jpg)  
 ![image](https://github.com/YBYCS/SimpleCurriculum/blob/master/images/kcb.jpg)  
