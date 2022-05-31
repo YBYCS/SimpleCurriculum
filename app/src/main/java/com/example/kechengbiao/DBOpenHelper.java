@@ -184,7 +184,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private void initCourseData(){
         //创建课程数据表
         sql ="create table coursedata(id integer primary key autoincrement,name char(20),teacher varchar(20),classroom varchar(20)," +
-                " begintime integer, sum integer, week char(50),color char(50),period integer )";
+                " begintime integer, sum integer, week char(50),color char(50),period integer, isOddWeek integer, isDoubleWeek integer)";
         db.execSQL(sql);
     }
 }

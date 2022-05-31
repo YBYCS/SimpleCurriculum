@@ -34,7 +34,7 @@ import java.util.Random;
 public class SettingCourse extends AppCompatActivity {
 
     TextView courseTime,courseName,teacher,classroom,confirm,cancel;
-    private courseDataClass dt;
+    private courseDataClass dt;//临时存储数据
     int msum,asum,esum,weekSum,courseSum;
     ArrayList<ToggleButton> selectWeekList = new ArrayList<>();//选择第几周上课按钮列表
     RadioButton oddWeek,doubleWeek,allWeek;
@@ -66,65 +66,7 @@ public class SettingCourse extends AppCompatActivity {
         }
     }
 
-    //设置那一周上课的选择卡
-    void addWeekSelectCard(){
 
-        LinearLayout container = (LinearLayout) findViewById(R.id.selectWeekContainer);//第几周上课选择卡的容器
-        for (int i = 0; i < weekSum; i+=6) {
-
-            LinearLayout cardContainer = new LinearLayout(this);
-            cardContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    dip2px(this,40)));
-            cardContainer.setOrientation(LinearLayout.HORIZONTAL);
-            cardContainer.setPadding(dip2px(this,10),dip2px(this,5),dip2px(this,10),0);
-            container.addView(cardContainer);
-            for (int j = 0; j < 6; j++) {
-                //添加空的占位控件
-                if(i+j==weekSum){
-                    for (int k = 0; k < 6-weekSum%6; k++) {
-                        TextView kong = new TextView(this);
-                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1);
-                        lp.setMargins(5,0,5,0);
-                        kong.setLayoutParams(lp);
-                        cardContainer.addView(kong);
-                    }
-                    break;
-                }
-                //添加周选择卡
-                ToggleButton card = new ToggleButton(this);
-                card.setTextOn(""+(i+1+j));
-                card.setTextOff(""+(i+1+j));
-                card.setTextColor(this.getColor(R.color.defaultWhite));
-
-                card.setChecked(true);
-                card.setBackground(this.getDrawable(R.drawable.bg_togglebutton));
-                card.setTag(j+i);//数组从0开始
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1);
-                lp.setMargins(5,0,5,0);
-                card.setLayoutParams(lp);
-                //周选择卡选择状态发生变更后 改变选择的周
-                card.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        int tag = (int)compoundButton.getTag();
-                        String copy;
-                        if(b){
-
-                            copy = dt.week.substring(0,tag) + "1" +dt.week.substring(tag+1);
-
-                        }
-                        else{
-                            copy = dt.week.substring(0,tag) + "0" +dt.week.substring(tag+1);
-                        }
-                        dt.week = copy;
-
-                    }
-                });
-                cardContainer.addView(card);
-                selectWeekList.add(card);
-            }
-        }
-    }
 
     //如果是添加新的课程的初始化
     void initAdd(Intent intent){
@@ -134,12 +76,14 @@ public class SettingCourse extends AppCompatActivity {
         courseTime.setText(dt.beginTime+"-"+dt.beginTime);
         allWeek.setChecked(true);
         dt.week = "";
+        //初始化选择周的字符串
         for (int j = 0; j < weekSum; j++) {
             dt.week += "1";
         }
         //随机取个颜色
         Random random = new Random();
         colorSelectList.get(random.nextInt(6)).setChecked(true);
+        //删除课程按钮不能使用
         Button button = findViewById(R.id.deleteCourse);
         button.setEnabled(false);
         button.setTextColor(getColor(R.color.blackOfShow));
@@ -160,6 +104,9 @@ public class SettingCourse extends AppCompatActivity {
         courseTime.setText(dt.beginTime+"-"+(dt.beginTime+dt.sum-1));
         dt.color = intent.getIntExtra("color",1);
         colorSelectList.get(dt.color-1).setChecked(true);
+
+
+
         for (int i = 0; i < weekSum; i++) {
             if(dt.week.substring(i,i+1).equals("1")){
                 selectWeekList.get(i).setChecked(true);
@@ -168,6 +115,12 @@ public class SettingCourse extends AppCompatActivity {
                 selectWeekList.get(i).setChecked(false);
             }
         }
+        //改变周选择卡会改变单双周的状态所以要放在下面
+        Cursor cursor = db.query("courseData",null,"id=?",new String[]{""+dt.id},null,null,null);
+        cursor.moveToFirst();
+        dt.isOddWeek = cursor.getInt(cursor.getColumnIndexOrThrow("isOddWeek"));
+        dt.isDoubleWeek= cursor.getInt(cursor.getColumnIndexOrThrow("isDoubleWeek"));
+
         Button button = findViewById(R.id.deleteCourse);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +170,6 @@ public class SettingCourse extends AppCompatActivity {
         //确认按钮
         confirm = findViewById(R.id.stCourse_confirm);
         confirm.setOnClickListener(new View.OnClickListener() {
-            //todo 编辑数据有bug
             @Override
             public void onClick(View view) {
                 if(courseName.length()!=0){
@@ -244,6 +196,8 @@ public class SettingCourse extends AppCompatActivity {
                     values.put("week",dt.week);
                     values.put("color",dt.color);
                     values.put("period",dt.period);
+                    values.put("isOddWeek ",dt.isOddWeek);
+                    values.put("isDoubleWeek",dt.isDoubleWeek);
                     //添加新的课程为插入
                     if(isAdd){
                         db.insert("coursedata",null,values);
@@ -271,7 +225,7 @@ public class SettingCourse extends AppCompatActivity {
         doubleWeek = findViewById(R.id.doubleWeek);
         allWeek = findViewById(R.id.allWeek);
         rg_week = findViewById(R.id.select_week);
-        //单周 双周 全选 选择框 监听函数
+        //单周 双周 全选 组合框 监听函数
         rg_week.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -287,7 +241,8 @@ public class SettingCourse extends AppCompatActivity {
 
                         }
                     }
-
+                    //是否为单周
+                    dt.isOddWeek = 1;
                 }
                 //双周
                 else if(i==doubleWeek.getId()){
@@ -302,6 +257,7 @@ public class SettingCourse extends AppCompatActivity {
 
                         }
                     }
+                    dt.isDoubleWeek = 1;
                 }
                 //全选
                 else{
@@ -309,11 +265,14 @@ public class SettingCourse extends AppCompatActivity {
                         selectWeekList.get(j).setChecked(true);
 
                     }
+
+                    dt.isOddWeek = 1;
+                    dt.isDoubleWeek = 1;
                 }
             }
         });
         shangkeshijian = findViewById(R.id.shangkeshijian);//设置上课第几节
-        //设置选择节数框
+        //设置选择上课时间节数框
         shangkeshijian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -371,6 +330,76 @@ public class SettingCourse extends AppCompatActivity {
 
             }
         });
+
+        //颜色选择器
+        initColorSelect();
+
+    }
+
+    //设置那一周上课的选择卡
+    void addWeekSelectCard(){
+
+        LinearLayout container = (LinearLayout) findViewById(R.id.selectWeekContainer);//第几周上课选择卡的容器
+        for (int i = 0; i < weekSum; i+=6) {
+
+            LinearLayout cardContainer = new LinearLayout(this);
+            cardContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    dip2px(this,40)));
+            cardContainer.setOrientation(LinearLayout.HORIZONTAL);
+            cardContainer.setPadding(dip2px(this,10),dip2px(this,5),dip2px(this,10),0);
+            container.addView(cardContainer);
+            for (int j = 0; j < 6; j++) {
+                //添加空的占位控件
+                if(i+j==weekSum){
+                    for (int k = 0; k < 6-weekSum%6; k++) {
+                        TextView kong = new TextView(this);
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1);
+                        lp.setMargins(5,0,5,0);
+                        kong.setLayoutParams(lp);
+                        cardContainer.addView(kong);
+                    }
+                    break;
+                }
+                //添加周选择卡
+                ToggleButton card = new ToggleButton(this);
+                card.setTextOn(""+(i+1+j));
+                card.setTextOff(""+(i+1+j));
+                card.setTextColor(this.getColor(R.color.defaultWhite));
+
+                card.setChecked(true);
+                card.setBackground(this.getDrawable(R.drawable.bg_togglebutton));
+                card.setTag(j+i);//数组从0开始
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1);
+                lp.setMargins(5,0,5,0);
+                card.setLayoutParams(lp);
+                //周选择卡选择状态发生变更后(点击了或者是别的方法改变了) 改变选择的周
+                card.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        int tag = (int)compoundButton.getTag();
+                        String copy;
+                        if(b){
+
+                            copy = dt.week.substring(0,tag) + "1" +dt.week.substring(tag+1);
+
+                        }
+                        else{
+                            copy = dt.week.substring(0,tag) + "0" +dt.week.substring(tag+1);
+                        }
+                        dt.week = copy;
+                        dt.isDoubleWeek = 0;//点击了选择卡后就不再是单周双周全选了
+                        dt.isOddWeek = 0;
+                    }
+                });
+                cardContainer.addView(card);
+                selectWeekList.add(card);
+            }
+        }
+    }
+
+    //初始化颜色选择器
+    private void initColorSelect(){
+        //颜色选择器
         colorSelectList = new ArrayList<>();
         colorSelectList.add(findViewById(R.id.color1));
         GradientDrawable gradientDrawable = (GradientDrawable) colorSelectList.get(0).getBackground().getCurrent();
@@ -464,7 +493,7 @@ public class SettingCourse extends AppCompatActivity {
         }
     }
 
-    //滑动选择框的数据初始化
+    //滑动选择框的数据初始化 选择上课时间
     ArrayList<String> bj = new ArrayList<>();
     private void initWheelData(){
         for (int i = 1; i <= courseSum; i++) {
@@ -474,7 +503,7 @@ public class SettingCourse extends AppCompatActivity {
     //课程数据类
     private class courseDataClass {
         public String name, teacher, classroom, week;
-        public int beginTime,sum,period ,id,color;
+        public int beginTime,sum,period ,id,color,isOddWeek=0,isDoubleWeek=0;
     }
 
 

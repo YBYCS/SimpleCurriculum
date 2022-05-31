@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Debug;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +37,7 @@ public class SettingFragment extends Fragment {
     TextView tv_beginTime,tv_weekSum;
     DBOpenHelper dbOpenHelper;//sqlite helper类的子类
     SQLiteDatabase db;
-    int selectWeek;
+    int selectWeek,weekSum;
     MainActivity mainActivity;
     @Nullable
     @Override
@@ -93,7 +94,7 @@ public class SettingFragment extends Fragment {
                 Cursor cursor = db.query("setting",null,"name=?",new String[]{"weeksum"},null,null,null);
                 cursor.moveToFirst();
                 int weekSum = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
-                //初始化数据
+                //初始化滑动选择框的数据
                 for(int i=1;i<31;i++)wheelDataList.add(String.format("%d",i));
                 showChoiceDialog(wheelDataList,  weekSum-1,
                         new WheelView.OnWheelViewListener() {
@@ -186,6 +187,7 @@ public class SettingFragment extends Fragment {
         cursor = db.query("setting",null,"name=?",new String[]{"weeksum"},null,null,null);
         cursor.moveToFirst();
         time = cursor.getInt(cursor.getColumnIndexOrThrow("state"));
+        weekSum = time;
         str = time+"";
         tv_weekSum.setText(str);
 
@@ -260,7 +262,7 @@ public class SettingFragment extends Fragment {
         alert.show();
     }
 
-    //设置总周数 单个滑动选择框
+    //设置总周数 单个滑动选择框通用的监听
     private void showChoiceDialog(ArrayList<String> dataList,int selected,
                                       WheelView.OnWheelViewListener listener){
         selectText = "";
@@ -291,6 +293,10 @@ public class SettingFragment extends Fragment {
 
                 ContentValues values = new ContentValues();
                 String data = selectText;
+                if(Integer.parseInt(data)>weekSum){
+                    modificationWeekData(Integer.parseInt(data));
+                }
+                weekSum = Integer.parseInt(data);
                 values.put("state",data);
                 db.update("setting",values,"name=?",new String[]{"weeksum"});
                 tv_weekSum.setText(selectText);
@@ -301,6 +307,42 @@ public class SettingFragment extends Fragment {
         alert.show();
 
     }
+
+    //修改总周数后 统一修改所有课程的第几周上课情况
+    private void modificationWeekData(int newWeekSum){
+
+        Cursor cursor;
+        cursor = db.query("courseData",null,null,null,null,null,null);
+        while (cursor.moveToNext()){
+            int isodd,isdouble,id;
+            String week;
+
+            isodd = cursor.getInt(cursor.getColumnIndexOrThrow("isOddWeek"));
+            isdouble = cursor.getInt(cursor.getColumnIndexOrThrow("isDoubleWeek"));
+            week = cursor.getString(cursor.getColumnIndexOrThrow("week"));
+            week = week.substring(0,weekSum);//截取原来周数长度 因为修改的更小的时候没有处理多的部分
+            id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+            for (int i = weekSum; i < newWeekSum; i++) {
+                //单数 从零开始
+                if(i%2==0&&isodd==1){
+                    week += "1";
+
+                }
+                else if(i%2!=0&&isdouble==1){
+                    week += "1";
+                }
+                else{
+                    week += "0";
+                }
+            }
+            ContentValues values = new ContentValues();
+            values.put("week",week);
+
+            db.update("courseData",values,"id=?",new String[]{""+id});
+        }
+
+    }
+
     CourseData dt;//用来存放数据的类
     //初始化数据
     void initData(){
